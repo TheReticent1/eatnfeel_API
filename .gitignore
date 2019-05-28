@@ -1,0 +1,9 @@
+# dependencies
+node_modules
+nodemon
+nodemon.cmd
+
+
+
+# misc
+.env
