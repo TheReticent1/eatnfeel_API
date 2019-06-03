@@ -14,6 +14,7 @@ const addMenu = require("./models/addMenu");
 const signUp = require("./models/signUpModel");
 const mobile = require("./models/mobileModel");
 const address = require("./models/addressModel");
+const Admin = require("./models/adminModel");
 
 // Import routes
 
@@ -25,6 +26,8 @@ const mobileRoutes = require("./routes/mobileRoutes");
 const getMobileRoutes = require("./routes/getMobileRoutes");
 const addAddressRoutes = require("./routes/addAddressRoutes");
 const getAddressRoutes = require("./routes/getAddressRoutes");
+const adminSignUpRoutes = require("./routes/adminSignUpRoutes");
+const adminSignInRoutes = require("./routes/adminSignInRoutes");
 const logger = require("./logs/log");
 
 //middlewares
@@ -32,9 +35,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 const morgan = require("morgan");
+const authCheck = require("./auth/checkAuth");
 
 //controllers
-app.post("/addmenu", (req, res) => {
+app.post("/addmenu",authCheck, (req, res) => {
   addMenuRoutes.addMenuRoutes(req, res, addMenu, mongoose);
 });
 app.get("/menu", (req, res) => {
@@ -50,15 +54,20 @@ app.post("/mobile/add", (req, res) => {
   mobileRoutes.mobileRoutes(req, res, mongoose, mobile);
 });
 app.post("/mobile", (req, res) => {
-  getMobileRoutes.getMobileRoutes(req,res,mobile);
+  getMobileRoutes.getMobileRoutes(req, res, mobile);
 });
-app.post("/address/add",(req,res)=>{
-  addAddressRoutes.addAddress(req,res,mongoose,address);
+app.post("/address/add", (req, res) => {
+  addAddressRoutes.addAddress(req, res, mongoose, address);
 })
-app.post("/addresses",(req,res)=>{
-  getAddressRoutes.getAddressRoutes(req,res,address);
+app.post("/addresses", (req, res) => {
+  getAddressRoutes.getAddressRoutes(req, res, address);
 })
-
+app.post("/admin/register", (req, res) => {
+  adminSignUpRoutes.adminSignUp(req, res, Admin, mongoose, bcrypt);
+})
+app.post("/admin/login", (req, res) => {
+  adminSignInRoutes.adminSignInRoutes(req,res,Admin,bcrypt);
+})
 //morgan middleware can be used to tranfer error to console, one file to another file etc
 app.use(morgan("combined", { stream: logger.stream }));
 
