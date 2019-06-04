@@ -1,75 +1,33 @@
 "use strict";
-
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const bcrypt = require("bcrypt-nodejs");
+const expressValidator = require("express-validator");
+const morgan = require("morgan");
+
+//invokes express
 let app = express();
 
 //connection
 const { mongoose } = require("./db/index");
 
-//models
-const addMenu = require("./models/addMenu");
-const signUp = require("./models/signUpModel");
-const mobile = require("./models/mobileModel");
-const address = require("./models/addressModel");
-const Admin = require("./models/adminModel");
-
-// Import routes
-
-const addMenuRoutes = require("./routes/adMenuRoutes");
-const getMenuRoutes = require("./routes/getMenuRoutes");
-const signUpRoutes = require("./routes/signUpRoutes");
-const signInRoutes = require("./routes/signInRoutes");
-const mobileRoutes = require("./routes/mobileRoutes");
-const getMobileRoutes = require("./routes/getMobileRoutes");
-const addAddressRoutes = require("./routes/addAddressRoutes");
-const getAddressRoutes = require("./routes/getAddressRoutes");
-const adminSignUpRoutes = require("./routes/adminSignUpRoutes");
-const adminSignInRoutes = require("./routes/adminSignInRoutes");
+//import routes
+const userRoutes = require("./routes/user");
+const contactRoutes = require("./routes/contact");
+const adminRoutes = require("./routes/admin");
+const menuRoutes = require("./routes/menu");
 const logger = require("./logs/log");
 
 //middlewares
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
-const morgan = require("morgan");
-const authCheck = require("./auth/checkAuth");
-
-//controllers
-app.post("/addmenu",authCheck, (req, res) => {
-  addMenuRoutes.addMenuRoutes(req, res, addMenu, mongoose);
-});
-app.get("/menu", (req, res) => {
-  getMenuRoutes.getMenuRoute(req, res, addMenu);
-});
-app.post("/signup", async (req, res) => {
-  await signUpRoutes.signUpRoutes(req, res, bcrypt, signUp, mongoose);
-});
-app.post("/signin", (req, res) => {
-  signInRoutes.signInRoutes(req, res, signUp, bcrypt);
-});
-app.post("/mobile/add", (req, res) => {
-  mobileRoutes.mobileRoutes(req, res, mongoose, mobile);
-});
-app.post("/mobile", (req, res) => {
-  getMobileRoutes.getMobileRoutes(req, res, mobile);
-});
-app.post("/address/add", (req, res) => {
-  addAddressRoutes.addAddress(req, res, mongoose, address);
-})
-app.post("/addresses", (req, res) => {
-  getAddressRoutes.getAddressRoutes(req, res, address);
-})
-app.post("/admin/register", (req, res) => {
-  adminSignUpRoutes.adminSignUp(req, res, Admin, mongoose, bcrypt);
-})
-app.post("/admin/login", (req, res) => {
-  adminSignInRoutes.adminSignInRoutes(req,res,Admin,bcrypt);
-})
-//morgan middleware can be used to tranfer error to console, one file to another file etc
-app.use(morgan("combined", { stream: logger.stream }));
+app.use(morgan("combined", { stream: logger.stream })); //morgan global error handler
+app.use(expressValidator());
+app.use("/", userRoutes);
+app.use("/", contactRoutes);
+app.use("/", adminRoutes);
+app.use("/",menuRoutes);
 
 app.listen(3000, () => {
   logger.info("server running on port 3000");

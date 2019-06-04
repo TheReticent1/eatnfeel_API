@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
 
-const adminModel = mongoose.Schema({
-  _id:mongoose.Schema.Types.ObjectId,
-
+const admin = mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -26,10 +24,10 @@ const adminModel = mongoose.Schema({
     type: Date,
     default: Date.now()
   },
-  authKey:{
-    type:String,
-    required:true
+  authKey: {
+    type: String,
+    required: true
   }
 });
 
-module.exports = mongoose.model('Admin',adminModel);
+module.exports = mongoose.model('admin', admin);

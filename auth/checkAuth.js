@@ -6,6 +6,7 @@ dotenv.config();
 module.exports = (req, res, next) => {
   try {
     const verify = jwt.verify(req.headers.authorization,process.env.JWT_KEY);
+    console.log(verify);
     next();
   } catch (error) {
       res.status(400).json("Authentication failed");
