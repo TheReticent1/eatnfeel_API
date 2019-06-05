@@ -15,7 +15,7 @@ exports.addMenu = (req, res) => {
 exports.getMenu = (req, res) => {
   menu
   .find()
-  .select("_id name description price food_type")
+  .select("_id name description labels price food_type")
   .exec()
   .then(menu => {
     console.log(menu);
@@ -25,4 +25,20 @@ exports.getMenu = (req, res) => {
     console.log(err);
     res.status(400).json(err);
   });
+}
+
+exports.updateMenu=(req,res)=>{
+  const {_id,name,description,labels,price,food_type}=req.body;
+  menu.update({_id},{name,description,labels,price,food_type})
+  .exec()
+  .then(result=>{
+    if(result["ok"]){
+      res.json("menu updated successfully");
+    }else{
+      res.json("not updated");
+    }
+  })
+  .catch(error=>{
+    res.json(error);
+  })
 }

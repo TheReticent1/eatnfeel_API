@@ -125,14 +125,74 @@ exports.addMenuValidator = (req, res, next) => {
   //labels
   req.check("labels", "write a label").notEmpty();
   req.check("labels", "labels must be 4 characters or more").isLength({
-    min:4
+    min: 4
   });
   //price
   req.check("price", "write a price").notEmpty();
   //foodType
   req.check("food_type", "write a food type").notEmpty();
   req.check("food_type", "food type must be 3 characters or more").isLength({
-    min:3
+    min: 3
+  });
+  const errors = req.validationErrors();
+  if (errors) {
+    const firstError = errors.map(error => error.msg)[0];
+    return res.status(400).json({ error: firstError });
+  }
+  //proceed to next middleware
+  next();
+}
+
+exports.updateValidator = (req, res, next) => {
+  req.check("_id","enter user id").notEmpty();
+  //name
+  req.check("name", "enter your full name").notEmpty();
+  req.check("name", "lenght must be 5 or more").isLength({
+    min: 5,
+    max: 50
+  });
+  //email
+  req.check("email", "enter your mail id").notEmpty();
+  req.check("email", "please enter proper mail id").isEmail();
+  //password
+  req.check("password", "enter password").notEmpty();
+  req.check("newPassword", "enter new password").notEmpty();
+  //check for errors
+  const errors = req.validationErrors();
+  if (errors) {
+    const firstError = errors.map(error => error.msg)[0];
+    return res.status(400).json({ error: firstError });
+  }
+  //proceed to next middleware
+  next();
+}
+
+exports.updateMenuValidator = (req, res, next) => {
+  req.check("_id","enter menu id").notEmpty();
+  //name
+  req.check("name", "write a name").notEmpty();
+  req.check("name", "name must be between 4 to 150 characters").isLength({
+    min: 4,
+    max: 150
+  });
+  //description
+  req.check("description", "write a description").notEmpty();
+  req.check("description", "description must be between 4 to 2000 charecters")
+    .isLength({
+      min: 4,
+      max: 2000
+    });
+  //labels
+  req.check("labels", "write a label").notEmpty();
+  req.check("labels", "labels must be 4 characters or more").isLength({
+    min: 4
+  });
+  //price
+  req.check("price", "write a price").notEmpty();
+  //foodType
+  req.check("food_type", "write a food type").notEmpty();
+  req.check("food_type", "food type must be 3 characters or more").isLength({
+    min: 3
   });
   const errors = req.validationErrors();
   if (errors) {

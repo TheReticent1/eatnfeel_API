@@ -1,6 +1,9 @@
 const signUp = require("../models/signUpModel");
 const bcrypt = require("bcrypt-nodejs");
 const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
+dotenv.config();
 
 exports.signUp = (req, res) => {
   const { name, email, password } = req.body;
@@ -55,9 +58,23 @@ exports.signIn = (req, res) => {
         signUp
           .find({ email }, { name: 1, email: 1 })
           .exec()
-          .then(result => {
-            console.log(result);
-            res.status(200).json(result);
+          .then(result1 => {
+            // token generation
+            //payload
+            var token = jwt.sign({
+              email: result1[0].email,
+              userId: result1[0]._id
+            },
+              //secret key
+              process.env.USER_KEY,
+              //key expires in
+              {
+                expiresIn: "1h"
+              });
+            return res.status(200).json({
+              result: result1,
+              token: token
+            });
           })
           .catch(err => {
             res.status(400).json(err);
@@ -71,3 +88,34 @@ exports.signIn = (req, res) => {
       res.status(400).json("invalid credentials");
     });
 };
+
+exports.updateUser = (req, res) => {
+  const { _id, name, email, password, newPassword } = req.body;
+  signUp
+    .find({ _id }, { password: 1 })
+    .exec()
+    .then(result => {
+      const hash = result[0].password;
+      const pass = bcrypt.compareSync(password, hash);
+      const newPass = bcrypt.hashSync(newPassword);
+      if (pass) {
+        signUp.update({ _id }, { name, email, password: newPass })
+        .exec()
+        .then(result=>{
+          if(result["ok"]){
+            res.json("Updated Successfully");
+          }else {
+            res.json("Not updated");
+          }
+        })
+        .catch(error=>{
+          res.json(error);
+        })
+      }else{
+        res.json("password not matched");
+      }
+    })
+    .catch(err => {
+      res.json(err);
+    })
+}

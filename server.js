@@ -27,7 +27,7 @@ app.use(expressValidator());
 app.use("/", userRoutes);
 app.use("/", contactRoutes);
 app.use("/", adminRoutes);
-app.use("/",menuRoutes);
+app.use("/", menuRoutes);
 
 app.listen(3000, () => {
   logger.info("server running on port 3000");
