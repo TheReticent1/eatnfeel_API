@@ -38,10 +38,10 @@ exports.getMobile = (req, res) => {
   mobiles.find({
     userId: id
   })
-    .select("mobile")
+    .select("userId mobile")
     .exec()
     .then(result => {
-      if (result.length >=1) {
+      if (result.length >= 1) {
         console.log(result);
         res.status(200).json(result);
       } else {
@@ -53,7 +53,27 @@ exports.getMobile = (req, res) => {
     });
 }
 
-exports.addAddress=(req,res)=>{
+exports.updateMobile = (req, res) => {
+  const { _id, userId, mobile } = req.body;
+  mobiles
+    .updateOne({ _id, userId }, { mobile })
+    .exec()
+    .then(result => {
+      if (result["ok"]) {
+        res.json("Mobile no updated");
+      } else {
+        res.json("not updated");
+      }
+    })
+    .catch(error => {
+      if(error["code"]){
+        res.json("number already present");
+      }
+      res.json(error);
+    });
+}
+
+exports.addAddress = (req, res) => {
   //adding new address
   const addAddress = new address(req.body);
   //save to database
@@ -68,7 +88,7 @@ exports.addAddress=(req,res)=>{
     });
 };
 
-exports.getAddresses=(req,res)=>{
+exports.getAddresses = (req, res) => {
   const id = req.params.userId;
   address.find({
     userId: id
@@ -76,7 +96,7 @@ exports.getAddresses=(req,res)=>{
     .select("userId addressArea completeAddress addressType")
     .exec()
     .then(result => {
-      if (result.length >=1) {
+      if (result.length >= 1) {
         console.log(result);
         res.status(200).json(result);
       } else {
@@ -86,4 +106,20 @@ exports.getAddresses=(req,res)=>{
     .catch(error => {
       res.status(400).json(error)
     });
+}
+
+exports.updateAddress = (req, res) => {
+  const { _id, userId, addressArea, completeAddress, addressType } = req.body;
+  address.updateOne({_id,userId},{addressArea,completeAddress,addressType})
+  .exec()
+  .then(result=>{
+    if(result["ok"]){
+      res.json("address updated successfully");
+    }else{
+      res.json("not updated");
+    }
+  })
+  .catch(error=>{
+    res.json(error);
+  })
 }

@@ -97,3 +97,37 @@ exports.signIn = (req, res) => {
       res.status(400).json("invalid credentials");
     });
 }
+
+exports.updateAdmin = (req, res) => {
+  const { _id, name, email, password, newPassword, authKey } = req.body;
+  admin
+    .find({ _id }, { password: 1 })
+    .exec()
+    .then(result => {
+      const hash = result[0].password;
+      const pass = bcrypt.compareSync(password, hash);
+      const newPass = bcrypt.hashSync(newPassword);
+      const resto = bcrypt.hashSync(authKey);
+      //checking admin key to register as admin
+      const skey = bcrypt.compareSync(process.env.ADMIN_KEY, resto);
+      if (pass && skey) {
+        admin.updateOne({ _id }, { name, email, password: newPass, authKey:resto})
+          .exec()
+          .then(result => {
+            if (result["ok"]) {
+              res.json("Updated Successfully");
+            } else {
+              res.json("Not updated");
+            }
+          })
+          .catch(error => {
+            res.json(error);
+          })
+      } else {
+        res.json("password or authkey not matched");
+      }
+    })
+    .catch(err => {
+      res.json(err);
+    })
+}

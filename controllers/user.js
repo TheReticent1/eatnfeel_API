@@ -99,7 +99,7 @@ exports.updateUser = (req, res) => {
       const pass = bcrypt.compareSync(password, hash);
       const newPass = bcrypt.hashSync(newPassword);
       if (pass) {
-        signUp.update({ _id }, { name, email, password: newPass })
+        signUp.updateOne({ _id }, { name, email, password: newPass })
         .exec()
         .then(result=>{
           if(result["ok"]){
