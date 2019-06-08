@@ -2,7 +2,8 @@
 node_modules
 nodemon
 nodemon.cmd
-./logs
+logs
+uploads
 
 
 # misc

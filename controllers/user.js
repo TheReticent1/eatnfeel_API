@@ -2,6 +2,7 @@ const signUp = require("../models/signUpModel");
 const bcrypt = require("bcrypt-nodejs");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
+const _ = require("lodash");
 const dotenv = require("dotenv");
 dotenv.config();
 
@@ -89,33 +90,50 @@ exports.signIn = (req, res) => {
     });
 };
 
-exports.updateUser = (req, res) => {
-  const { _id, name, email, password, newPassword } = req.body;
+// mapping admin users as a profile by creating adminById method
+exports.userById = (req, res, next, id) => {
+  signUp.findById(id).exec((err, user) => {
+    if (err || !user) {
+      return res.status(400).json({
+        error: "user not found"
+      });
+    }
+    req.profile = user;
+    next();
+  });
+};
+
+exports.allUsers = (req, res) => {
   signUp
-    .find({ _id }, { password: 1 })
-    .exec()
-    .then(result => {
-      const hash = result[0].password;
-      const pass = bcrypt.compareSync(password, hash);
-      const newPass = bcrypt.hashSync(newPassword);
-      if (pass) {
-        signUp.updateOne({ _id }, { name, email, password: newPass })
-        .exec()
-        .then(result=>{
-          if(result["ok"]){
-            res.json("Updated Successfully");
-          }else {
-            res.json("Not updated");
-          }
-        })
-        .catch(error=>{
-          res.json(error);
-        })
-      }else{
-        res.json("password not matched");
+    .find((err, users) => {
+      if (err) {
+        return res.status(400).json({
+          error: err
+        });
       }
+      res.json({ users });
     })
-    .catch(err => {
-      res.json(err);
-    })
-}
+    .select("name email updated created");
+};
+
+//get user
+exports.getUser = (req, res) => {
+  req.profile.password = undefined;
+  return res.json(req.profile);
+};
+
+//update user
+exports.updateUser = (req, res, next) => {
+  let user = req.profile;
+  user = _.extend(user, req.body); //extend object muted scource object
+  user.updated = Date.now();
+  user.save(err => {
+    if (err) {
+      return res.status(400).json({
+        error: "You are not authorized to perform this action"
+      });
+    }
+    user.password = undefined;
+    res.json({ user });
+  });
+};

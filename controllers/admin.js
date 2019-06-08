@@ -2,6 +2,7 @@ const admin = require("../models/adminModel");
 const bcrypt = require("bcrypt-nodejs");
 const dotenv = require("dotenv");
 const jwt = require("jsonwebtoken");
+const _ = require("lodash");
 dotenv.config();
 
 exports.signUp = (req, res) => {
@@ -98,36 +99,63 @@ exports.signIn = (req, res) => {
     });
 }
 
-exports.updateAdmin = (req, res) => {
-  const { _id, name, email, password, newPassword, authKey } = req.body;
-  admin
-    .find({ _id }, { password: 1 })
-    .exec()
-    .then(result => {
-      const hash = result[0].password;
-      const pass = bcrypt.compareSync(password, hash);
-      const newPass = bcrypt.hashSync(newPassword);
-      const resto = bcrypt.hashSync(authKey);
-      //checking admin key to register as admin
-      const skey = bcrypt.compareSync(process.env.ADMIN_KEY, resto);
-      if (pass && skey) {
-        admin.updateOne({ _id }, { name, email, password: newPass, authKey:resto})
-          .exec()
-          .then(result => {
-            if (result["ok"]) {
-              res.json("Updated Successfully");
-            } else {
-              res.json("Not updated");
-            }
-          })
-          .catch(error => {
-            res.json(error);
-          })
-      } else {
-        res.json("password or authkey not matched");
-      }
-    })
-    .catch(err => {
+// mapping admin users as a profile by creating adminById method
+exports.adminById = (req, res, next, id) => {
+  admin.findById(id).exec((err, user) => {
+    if (err || !user) {
+      return res.status(400).json({
+        error: "user not found"
+      });
+    }
+    req.adminProfile = user;
+
+    next();
+  });
+};
+
+//get admin user method
+exports.getadminUser = (req, res) => {
+  req.adminProfile.password = undefined;
+  req.adminProfile.authKey = undefined;
+  return res.json(req.adminProfile);
+};
+
+//update admin user method
+exports.updateAdminUsers = (req, res, next) => {
+  let user = req.adminProfile;
+  user = _.extend(user, req.body);
+  user.updated = Date.now();
+  user.save(err => {
+    if (err) {
+      return res.status(400).json({
+        error: "You are not authorized to perform this action"
+      });
+    }
+    user.password = undefined;
+    user.authKey = undefined;
+    res.json({ user });
+  });
+};
+
+//delete admin user
+exports.deleteAdminUsers = (req, res, next) => {
+  let user = req.adminProfile;
+  user.remove((err, user) => {
+    if (err) {
+      return res.status(400).json({
+        error: err
+      });
+    }
+
+    res.json({ message: "Admin User deleted successfully" });
+  });
+};
+
+exports.admins=(req,res)=>{
+  admin.find().exec((err, result)=>{
+    if(err){
       res.json(err);
-    })
+    }
+    res.json(result);
+  });
 }

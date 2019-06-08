@@ -1,5 +1,6 @@
 const mobiles = require("../models/mobileModel");
 const address = require("../models/addressModel");
+const _ = require("lodash");
 
 exports.addMobile = (req, res) => {
   const { mobile } = req.body;
@@ -53,26 +54,6 @@ exports.getMobile = (req, res) => {
     });
 }
 
-exports.updateMobile = (req, res) => {
-  const { _id, userId, mobile } = req.body;
-  mobiles
-    .updateOne({ _id, userId }, { mobile })
-    .exec()
-    .then(result => {
-      if (result["ok"]) {
-        res.json("Mobile no updated");
-      } else {
-        res.json("not updated");
-      }
-    })
-    .catch(error => {
-      if(error["code"]){
-        res.json("number already present");
-      }
-      res.json(error);
-    });
-}
-
 exports.addAddress = (req, res) => {
   //adding new address
   const addAddress = new address(req.body);
@@ -108,18 +89,59 @@ exports.getAddresses = (req, res) => {
     });
 }
 
-exports.updateAddress = (req, res) => {
-  const { _id, userId, addressArea, completeAddress, addressType } = req.body;
-  address.updateOne({_id,userId},{addressArea,completeAddress,addressType})
-  .exec()
-  .then(result=>{
-    if(result["ok"]){
-      res.json("address updated successfully");
-    }else{
-      res.json("not updated");
+// find addresses info by id
+exports.addressById = (req, res, next, id) => {
+  address.findById(id).exec((err, address) => {
+    if (err || !address) {
+      return res.status(400).json({
+        error: "address not found"
+      });
     }
-  })
-  .catch(error=>{
-    res.json(error);
-  })
-}
+    req.address = address;
+    next();
+  });
+};
+
+// update address info
+exports.updateAddress = (req, res, next) => {
+  let address = req.address;
+  address = _.extend(address, req.body); //extend object muted scource object
+  address.updated = Date.now();
+  address.save(err => {
+    if (err) {
+      return res.status(400).json({
+        error: "You are not authorized to perform this action"
+      });
+    }
+
+    res.json({ address });
+  });
+};
+
+// find mobile contact info by id
+exports.mobileById = (req, res, next, id) => {
+  mobiles.findById(id).exec((err, mobile) => {
+    if (err || !mobile) {
+      return res.status(400).json({
+        error: "address not found"
+      });
+    }
+    req.mobile = mobile;
+    next();
+  });
+};
+
+// update mobile contact.
+exports.updateMobile = (req, res, next) => {
+  let mobile = req.mobile;
+  mobile = _.extend(mobile, req.body);
+  mobile.updated = Date.now();
+  mobile.save(err => {
+    if (err) {
+      return res.status(400).json({
+        error: "You are not authorized to perform this action"
+      });
+    }
+    res.json({ mobile });
+  });
+};
