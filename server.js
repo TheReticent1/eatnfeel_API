@@ -16,6 +16,8 @@ const userRoutes = require("./routes/user");
 const contactRoutes = require("./routes/contact");
 const adminRoutes = require("./routes/admin");
 const menuRoutes = require("./routes/menu");
+const tableRoutes = require("./routes/table");
+const orderRoutes = require("./routes/order");
 const logger = require("./logs/log");
 
 //middlewares
@@ -28,6 +30,8 @@ app.use("/", userRoutes);
 app.use("/", contactRoutes);
 app.use("/", adminRoutes);
 app.use("/", menuRoutes);
+app.use("/", tableRoutes);
+app.use("/", orderRoutes);
 
 app.listen(3000, () => {
   logger.info("server running on port 3000");

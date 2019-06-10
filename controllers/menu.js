@@ -50,7 +50,7 @@ exports.menuById = (req, res, next, id) => {
 };
 
 //update menus
-exports.updateMenu = (req, res, next) => {
+exports.updateMenu = (req, res) => {
   const { name, description, labels, price, food_type } = req.body;
   let menu = req.menus;
   menu = _.extend(menu, { name, description, labels, price, food_type, imgPath: req.file.path });
@@ -66,7 +66,7 @@ exports.updateMenu = (req, res, next) => {
 };
 
 //delete menu
-exports.deleteMenu = (req, res, next) => {
+exports.deleteMenu = (req, res) => {
   let menu = req.menus;
   menu.remove((err, user) => {
     if (err) {
