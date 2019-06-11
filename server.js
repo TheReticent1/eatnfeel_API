@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const expressValidator = require("express-validator");
 const morgan = require("morgan");
+const fs = require("fs");
 
 //invokes express
 let app = express();
@@ -18,6 +19,7 @@ const adminRoutes = require("./routes/admin");
 const menuRoutes = require("./routes/menu");
 const tableRoutes = require("./routes/table");
 const orderRoutes = require("./routes/order");
+const reviewRoutes = require("./routes/review");
 const logger = require("./logs/log");
 
 //middlewares
@@ -32,6 +34,19 @@ app.use("/", adminRoutes);
 app.use("/", menuRoutes);
 app.use("/", tableRoutes);
 app.use("/", orderRoutes);
+app.use("/", reviewRoutes);
+
+app.get("/", (req, res) => {
+  fs.readFile("apis/apis.json", (err, data) => {
+    if (err) {
+      res.status(400).json({
+        error: err
+      });
+    }
+    const apis = JSON.parse(data);
+    res.json(apis);
+  });
+});
 
 app.listen(3000, () => {
   logger.info("server running on port 3000");

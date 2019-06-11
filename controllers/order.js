@@ -16,7 +16,7 @@ exports.addOrder = (req, res) => {
 exports.getOrder = (req, res) => {
   order
     .find()
-    .select("_id userId name addressArea completeAddress mobile order total deliveryCharge coupon discount")
+    .select("_id userId name addressArea completeAddress mobile order total deliveryCharge coupon discount status")
     .exec((err, result) => {
       if (err) {
         res.json(err);
@@ -58,5 +58,16 @@ exports.acceptOrder=(req,res)=>{
       res.status(400).json(error);
     }
     res.json(accept);
+  });
+};
+
+exports.cancleOrder=(req,res)=>{
+  let cancle = req.orders;
+  cancle = _.extend(cancle,req.body);
+  cancle.save((error)=>{
+    if(error){
+      res.status(400).json(error);
+    }
+    res.json(cancle);
   });
 };

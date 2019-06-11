@@ -1,3 +1,12 @@
+exports.errorNext = (req, res, next) => {
+  const errors = req.validationErrors();
+  if (errors) {
+    const firstError = errors.map(error => error.msg)[0];
+    return res.status(400).json({ error: firstError });
+  }
+  next();
+};
+
 exports.signUpValidator = (req, res, next) => {
   //name
   req.check("name", "enter your full name").notEmpty();
@@ -11,13 +20,7 @@ exports.signUpValidator = (req, res, next) => {
   //password
   req.check("password", "enter password").notEmpty();
   //check for errors
-  const errors = req.validationErrors();
-  if (errors) {
-    const firstError = errors.map(error => error.msg)[0];
-    return res.status(400).json({ error: firstError });
-  }
-  //proceed to next middleware
-  next();
+  this.errorNext(req, res, next);
 };
 
 exports.signInValidator = (req, res, next) => {
@@ -27,13 +30,7 @@ exports.signInValidator = (req, res, next) => {
   //password
   req.check("password", "enter password").notEmpty();
   //check for errors
-  const errors = req.validationErrors();
-  if (errors) {
-    const firstError = errors.map(error => error.msg)[0];
-    return res.status(400).json({ error: firstError });
-  }
-  //proceed to next middleware
-  next();
+  this.errorNext(req, res, next);
 }
 
 exports.addMobileValidator = (req, res, next) => {
@@ -43,22 +40,12 @@ exports.addMobileValidator = (req, res, next) => {
     min: 10,
     max: 10
   });
-  const errors = req.validationErrors();
-  if (errors) {
-    const firstError = errors.map(error => error.msg)[0];
-    return res.status(400).json({ error: firstError });
-  }
-  next();
+  this.errorNext(req, res, next);
 }
 
 exports.userIdValidator = (req, res, next) => {
   req.check("userId", "Please enter userid to param").notEmpty();
-  const errors = req.validationErrors();
-  if (errors) {
-    const firstError = errors.map(error => error.msg)[0];
-    return res.status(400).json({ error: firstError });
-  }
-  next();
+  this.errorNext(req, res, next);
 }
 
 exports.postAddressValidator = (req, res, next) => {
@@ -76,12 +63,7 @@ exports.postAddressValidator = (req, res, next) => {
     min: 4,
     max: 4
   });
-  const errors = req.validationErrors();
-  if (errors) {
-    const firstError = errors.map(error => error.msg)[0];
-    return res.status(400).json({ error: firstError });
-  }
-  next();
+  this.errorNext(req, res, next);
 }
 
 exports.addAdminValidator = (req, res, next) => {
@@ -99,13 +81,7 @@ exports.addAdminValidator = (req, res, next) => {
   //authkey
   req.check("authKey", "please enter auth key").notEmpty();
   //check for errors
-  const errors = req.validationErrors();
-  if (errors) {
-    const firstError = errors.map(error => error.msg)[0];
-    return res.status(400).json({ error: firstError });
-  }
-  //proceed to next middleware
-  next();
+  this.errorNext(req, res, next);
 }
 
 exports.addMenuValidator = (req, res, next) => {
@@ -135,18 +111,22 @@ exports.addMenuValidator = (req, res, next) => {
     min: 3
   });
   // req.check("imgPath","Please enter image").notEmpty();
-  const errors = req.validationErrors();
-  if (errors) {
-    const firstError = errors.map(error => error.msg)[0];
-    return res.status(400).json({ error: firstError });
-  }
-  //proceed to next middleware
-  next();
+  this.errorNext(req, res, next);
 }
 
 exports.updateValidator = (req, res, next) => {
   req.check("_id", "enter user id").notEmpty();
   this.signUpValidator(req, res, next);
+}
+
+exports.verifyValidator = (req, res, next) => {
+req.check("toNumber","Please enter receiver mobile number").notEmpty();
+req.check("toNumber","enter 12 digit mobile no with country code ").isLength({
+  min:12,
+  max:12
+});
+req.check("message","Please enter message to send").notEmpty();
+this.errorNext(req,res,next);
 }
 
 exports.updateMobileValidator = (req, res, next) => {
@@ -155,12 +135,7 @@ exports.updateMobileValidator = (req, res, next) => {
     min: 10,
     max: 10
   });
-  const errors = req.validationErrors();
-  if (errors) {
-    const firstError = errors.map(error => error.msg)[0];
-    return res.status(400).json({ error: firstError });
-  }
-  next();
+  this.errorNext(req, res, next);
 }
 
 exports.updateAddressValidator = (req, res, next) => {
@@ -177,12 +152,7 @@ exports.updateAddressValidator = (req, res, next) => {
     min: 4,
     max: 4
   });
-  const errors = req.validationErrors();
-  if (errors) {
-    const firstError = errors.map(error => error.msg)[0];
-    return res.status(400).json({ error: firstError });
-  }
-  next();
+  this.errorNext(req, res, next);
 }
 
 exports.updateAdminValidator = (req, res, next) => {
@@ -195,14 +165,7 @@ exports.updateAdminValidator = (req, res, next) => {
   //email
   req.check("email", "enter your mail id").notEmpty();
   req.check("email", "please enter proper mail id").isEmail();
-  //check for errors
-  const errors = req.validationErrors();
-  if (errors) {
-    const firstError = errors.map(error => error.msg)[0];
-    return res.status(400).json({ error: firstError });
-  }
-  //proceed to next middleware
-  next();
+  this.errorNext(req, res, next);
 }
 
 exports.updateUserValidator = (req, res, next) => {
@@ -215,25 +178,13 @@ exports.updateUserValidator = (req, res, next) => {
   //email
   req.check("email", "enter your mail id").notEmpty();
   req.check("email", "please enter proper mail id").isEmail();
-  //check for errors
-  const errors = req.validationErrors();
-  if (errors) {
-    const firstError = errors.map(error => error.msg)[0];
-    return res.status(400).json({ error: firstError });
-  }
-  //proceed to next middleware
-  next();
+  this.errorNext(req, res, next);
 }
 
 exports.addTableValidator = (req, res, next) => {
   req.check("tableNo", "Please enter table no.").notEmpty();
   req.check("totalSeat", "Please enter total seats for members").notEmpty();
-  const errors = req.validationErrors();
-  if (errors) {
-    const firstError = errors.map(error => error.msg)[0];
-    return res.status(400).json({ error: firstError });
-  }
-  next();
+  this.errorNext(req, res, next);
 }
 
 exports.bookTableValidator = (req, res, next) => {
@@ -250,21 +201,16 @@ exports.bookTableValidator = (req, res, next) => {
     min: 10,
     max: 10
   });
-  req.check("bookSeat","Please enter seats you want to book").notEmpty();
-  const errors = req.validationErrors();
-  if (errors) {
-    const firstError = errors.map(error => error.msg)[0];
-    return res.status(400).json({ error: firstError });
-  }
-  next();
+  req.check("bookSeat", "Please enter seats you want to book").notEmpty();
+  this.errorNext(req, res, next);
 }
 
-exports.addOrderValidator=(req,res,next)=>{
-  req.check("userId","Please enter user id").notEmpty();
-  req.check("name","Please enter customer name").notEmpty();
-  req.check("name","Please enter name more than 3 character").isLength({
-    min:3,
-    max:255
+exports.addOrderValidator = (req, res, next) => {
+  req.check("userId", "Please enter user id").notEmpty();
+  req.check("name", "Please enter customer name").notEmpty();
+  req.check("name", "Please enter name more than 3 character").isLength({
+    min: 3,
+    max: 255
   });
   req.check("addressArea", "please enter address area").notEmpty();
   req.check("addressArea", "Address area length must be greater than 6").isLength({
@@ -279,23 +225,29 @@ exports.addOrderValidator=(req,res,next)=>{
     min: 10,
     max: 10
   });
-  req.check("order","Please select food to order").notEmpty();
-  req.check("total","Please enter amount of order").notEmpty();
-  const errors = req.validationErrors();
-  if (errors) {
-    const firstError = errors.map(error => error.msg)[0];
-    return res.status(400).json({ error: firstError });
-  }
-  next();
+  req.check("order", "Please select food to order").notEmpty();
+  req.check("total", "Please enter amount of order").notEmpty();
+  this.errorNext(req, res, next);
 }
 
-exports.acceptOrderValidator=(req,res,next)=>{
-  req.check("status","Please enter 'Accept' as a status ").notEmpty();
-  req.check("estimateTime","Please enter time remaining for delivery").notEmpty();
-  const errors = req.validationErrors();
-  if (errors) {
-    const firstError = errors.map(error => error.msg)[0];
-    return res.status(400).json({ error: firstError });
-  }
-  next();
+exports.acceptOrderValidator = (req, res, next) => {
+  req.check("status", "Please enter 'Accept' as a status ").notEmpty();
+  req.check("estimateTime", "Please enter time remaining for delivery").notEmpty();
+  this.errorNext(req, res, next);
+}
+
+exports.cancleOrderValidator = (req, res, next) => {
+  req.check("status", "Please enter 'cancle' as a status ").notEmpty();
+  this.errorNext(req, res, next);
+}
+
+exports.reviewValidator = (req, res, next) => {
+  req.check("userId", "Please enter user id").notEmpty();
+  req.check("name", "Please enter customer name").notEmpty();
+  req.check("name", "Name must be 3 characters or more").isLength({
+    min: 3,
+    max: 255
+  });
+  req.check("rating", "Please rate us before submit").notEmpty();
+  this.errorNext(req, res, next);
 }

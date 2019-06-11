@@ -1,6 +1,9 @@
 const mobiles = require("../models/mobileModel");
 const address = require("../models/addressModel");
 const _ = require("lodash");
+const dotenv = require("dotenv");
+dotenv.config();
+const nexmo = require("../utilities/nexmoSend");
 
 exports.addMobile = (req, res) => {
   const { mobile } = req.body;
@@ -144,4 +147,18 @@ exports.updateMobile = (req, res, next) => {
     }
     res.json({ mobile });
   });
+};
+
+//sending verification message using nexmo
+exports.verifyNumber=(req,res)=>{
+  const {toNumber,message}=req.body;
+  nexmo.message.sendSms(
+    process.env.VIRTUAL_NUMBER,toNumber,message,{type:'unicode'},
+    (error,data)=>{
+      if(error){
+        res.json(error);
+      }
+      res.json(data);
+    }
+  );
 };

@@ -4,7 +4,8 @@ const {
   userIdValidator,
   postAddressValidator,
   updateMobileValidator,
-  updateAddressValidator
+  updateAddressValidator,
+  verifyValidator
 } = require("../validator/validation");
 const {
   addMobile,
@@ -14,7 +15,8 @@ const {
   addressById,
   mobileById,
   updateAddress,
-  updateMobile
+  updateMobile,
+  verifyNumber
 } = require("../controllers/contact");
 const userAuth = require("../auth/userAuth");
 
@@ -26,6 +28,7 @@ router.put("/mobile/:mobileId", userAuth, updateMobileValidator, updateMobile);
 router.post("/address/add", userAuth, postAddressValidator, addAddress);
 router.get("/addresses/:userId", userAuth, userIdValidator, getAddresses);
 router.put("/addresses/:addressId", userAuth, updateAddressValidator, updateAddress);
+router.post("/mobile/verify",verifyValidator,verifyNumber);
 
 router.param("addressId", addressById);
 router.param("mobileId", mobileById);

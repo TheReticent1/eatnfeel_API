@@ -1,7 +1,13 @@
-const { addOrder, getOrder, getUserOrder, orderById, acceptOrder } = require("../controllers/order");
+const {
+  addOrder,
+  getOrder,
+  getUserOrder,
+  orderById,
+  acceptOrder,
+  cancleOrder } = require("../controllers/order");
 const userAuth = require("../auth/userAuth");
 const authCheck = require("../auth/checkAuth");
-const { addOrderValidator, acceptOrderValidator } = require("../validator/validation");
+const { addOrderValidator, acceptOrderValidator, cancleOrderValidator } = require("../validator/validation");
 const express = require("express");
 
 const router = express.Router();
@@ -9,7 +15,8 @@ const router = express.Router();
 router.post("/order/add", userAuth, addOrderValidator, addOrder);
 router.get("/orders", authCheck, getOrder);
 router.get("/orders/:userId", userAuth, getUserOrder);
-router.put("/order/:orderId",authCheck,acceptOrderValidator,acceptOrder);
+router.put("/order/:orderId", authCheck, acceptOrderValidator, acceptOrder);
+router.put("/order/cancle/:orderId", userAuth,cancleOrderValidator,cancleOrder);
 
-router.param("orderId",orderById);
+router.param("orderId", orderById);
 module.exports = router;
